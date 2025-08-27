@@ -1,0 +1,44 @@
+{
+  "name": "hangout-backend",
+  "version": "1.0.0",
+  "description": "The back-end project is focused on creating a server for Hangout.",
+  "homepage": "https://github.com/jessmsang/hangout-backend#readme",
+  "bugs": {
+    "url": "https://github.com/jessmsang/hangout-backend/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jessmsang/hangout-backend.git"
+  },
+  "license": "ISC",
+  "author": "Jess Sang",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "lint": "npx eslint .",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "celebrate": "^15.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "express-winston": "^4.2.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "validator": "^13.15.15",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-import": "^2.31.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^2.8.8"
+  }
+}
