@@ -7,8 +7,7 @@ const { InternalServerError } = require("../utils/InternalServerError");
 const { ConflictError } = require("../utils/ConflictError");
 const { UnauthorizedError } = require("../utils/UnauthorizedError");
 const { CREATED } = require("../utils/errors");
-// TODO: REPLACE WITH SECURE JWT
-// const { JWT_SECRET } = require("../utils/config");
+const { JWT_SECRET } = process.env;
 const { privateUserHelper } = require("../utils/userHelpers");
 
 const getCurrentUser = (req, res, next) => {

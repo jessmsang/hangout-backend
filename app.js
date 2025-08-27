@@ -17,12 +17,10 @@ const { errors } = require("celebrate");
 // const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
-const { PORT = 3001 } = process.env;
+const { PORT = 3001, MONGO_URI } = process.env;
 
 mongoose
-  .connect
-  //TODO - INSERT MONGODB CONNECTION STRING
-  ()
+  .connect(MONGO_URI)
   .then(() => {
     console.log("Connected to DB");
   })
