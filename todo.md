@@ -5,9 +5,9 @@ Stage 3 (frontend + auth) will be added later.
 
 🔴 Critical Submission Requirements
 
-- [ ]API registers new users with valid data (POST /signup)
+- [ ] API registers new users with valid data (POST /signup)
 
-- [ ]App starts with npm run dev after installing dependencies
+- [ ] App starts with npm run dev after installing dependencies
 
 - [ ] No plagiarized code
 
