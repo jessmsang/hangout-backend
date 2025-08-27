@@ -20,9 +20,9 @@ const app = express();
 const { PORT = 3001 } = process.env;
 
 mongoose
-  .connect(
-    "mongodb+srv://jessmsang:IDa31UFTd9ifKKY3@my-first-cluster.7bub5mw.mongodb.net/"
-  )
+  .connect
+  //TODO - INSERT MONGODB CONNECTION STRING
+  ()
   .then(() => {
     console.log("Connected to DB");
   })
