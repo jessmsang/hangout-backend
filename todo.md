@@ -11,6 +11,12 @@ Stage 3 (frontend + auth) will be added later.
 
 - [ ] No plagiarized code
 
+- [ ] Edit "homepage" in package.json in hangout_frontend to actual deployed URL
+
+- [ ] Edit README in hangout_frontend repo with new deployment link
+
+- [ ] Edit basename in hangout_frontend repo in main.jsx to "/"
+
 🔵 Performance Criteria (80/100 required)
 
 Infrastructure & Linting

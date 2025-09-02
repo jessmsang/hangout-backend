@@ -125,7 +125,21 @@ const validateUserIDFormat = celebrate({
 
 const validateActivityIDFormat = celebrate({
   params: Joi.object().keys({
-    itemId: Joi.string().required().length(24).hex(),
+    activityId: Joi.string().required().length(24).hex(),
+  }),
+});
+
+const validatePasswordUpdate = celebrate({
+  body: Joi.object().keys({
+    oldPassword: Joi.string().required().messages({
+      "string.empty": 'The "oldPassword" field must be filled in',
+      "any.required": 'The "oldPassword" field is required',
+    }),
+    newPassword: Joi.string().required().min(6).messages({
+      "string.empty": 'The "newPassword" field must be filled in',
+      "string.min": 'The "newPassword" must be at least 6 characters long',
+      "any.required": 'The "newPassword" field is required',
+    }),
   }),
 });
 
@@ -136,4 +150,5 @@ module.exports = {
   validateUserLogin,
   validateUserIDFormat,
   validateActivityIDFormat,
+  validatePasswordUpdate,
 };

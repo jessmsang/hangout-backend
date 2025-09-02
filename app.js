@@ -6,21 +6,21 @@ const cors = require("cors");
 const helmet = require("helmet");
 const { errors } = require("celebrate");
 
-// const mainRouter = require("./routes/index");
-// const { createUser, login } = require("./controllers/users");
-// const errorHandler = require("./middlewares/errorHandler");
-// const limiter = require("./middlewares/rateLimit");
-// const {
-//   validateCreateUser,
-//   validateUserLogin,
-// } = require("./middlewares/validation");
-// const { requestLogger, errorLogger } = require("./middlewares/logger");
+const mainRouter = require("./routes/index");
+const { createUser, login } = require("./controllers/users");
+const errorHandler = require("./middlewares/errorHandler");
+const limiter = require("./middlewares/rateLimit");
+const {
+  validateCreateUser,
+  validateUserLogin,
+} = require("./middlewares/validation");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
-const { PORT = 3001, MONGO_URI } = process.env;
+const { PORT, MONGODB_URI } = process.env;
 
 mongoose
-  .connect(MONGO_URI)
+  .connect(MONGODB_URI)
   .then(() => {
     console.log("Connected to DB");
   })
@@ -31,7 +31,7 @@ app.use(cors());
 
 app.use(requestLogger);
 app.use(helmet());
-// app.use(limiter);
+app.use(limiter);
 
 app.get("/crash-test", () => {
   setTimeout(() => {
@@ -39,21 +39,15 @@ app.get("/crash-test", () => {
   }, 0);
 });
 
-app.post(
-  "/signup"
-  // validateCreateUser, createUser
-);
-app.post(
-  "/signin"
-  // validateUserLogin, login
-);
+app.post("/signup", validateCreateUser, createUser);
+app.post("/signin", validateUserLogin, login);
 
-// app.use("/", mainRouter);
+app.use("/", mainRouter);
 
-// app.use(errorLogger);
+app.use(errorLogger);
 
 app.use(errors());
-// app.use(errorHandler);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

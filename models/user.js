@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
+const { UnauthorizedError } = require("../utils/UnauthorizedError");
 
 const userSchema = new mongoose.Schema(
   {
@@ -29,35 +30,56 @@ const userSchema = new mongoose.Schema(
       required: [true, "Password is required."],
       minlength: [8, "Password must be at least 8 characters long."],
       select: false,
+      validate: {
+        validator(value) {
+          return /^(?=.*[A-Z])(?=.*[!@#$%^&*_+\-=?]).{8,50}$/.test(value);
+        },
+        message:
+          "Password must be 8–50 characters, include at least one uppercase letter and one special character.",
+      },
     },
+    savedActivities: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Activity" },
+    ],
+    completedActivities: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Activity" },
+    ],
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+userSchema.index({ email: 1 }, { unique: true });
+
+userSchema.pre("save", function (next) {
+  const user = this;
+
+  if (!user.isModified("password")) return next();
+
+  bcrypt
+    .hash(user.password, 10)
+    .then((hash) => {
+      user.password = hash;
+      next();
+    })
+    .catch((err) => next(err));
 });
 
-userSchema.statics.findUserByCredentials = async function (email, password) {
-  const user = await this.findOne({ email }).select("+password");
-  if (!user) {
-    const error = new Error("Invalid email or password");
-    error.name = "UnauthorizedError";
-    error.statusCode = 401;
-    throw error;
-  }
+userSchema.statics.findUserByCredentials = function (email, password) {
+  return this.findOne({ email })
+    .select("+password")
+    .then((user) => {
+      if (!user) {
+        throw new UnauthorizedError("Invalid email or password");
+      }
 
-  const matched = await bcrypt.compare(password, user.password);
-  if (!matched) {
-    const error = new Error("Invalid email or password");
-    error.name = "UnauthorizedError";
-    error.statusCode = 401;
-    throw error;
-  }
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          throw new UnauthorizedError("Invalid email or password");
+        }
 
-  return user;
+        return user;
+      });
+    });
 };
 
 module.exports = mongoose.model("User", userSchema);

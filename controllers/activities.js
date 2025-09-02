@@ -1,4 +1,5 @@
-const Activity = require("../models/Activity");
+const Activity = require("../models/activity");
+const User = require("../models/user");
 const { BadRequestError } = require("../utils/BadRequestError");
 const { NotFoundError } = require("../utils/NotFoundError");
 const { InternalServerError } = require("../utils/InternalServerError");
@@ -6,10 +7,31 @@ const { ForbiddenError } = require("../utils/ForbiddenError");
 const { CREATED } = require("../utils/errors");
 
 const createActivity = (req, res, next) => {
-  const { name, weather, imageUrl } = req.body;
+  const {
+    name,
+    description,
+    seasons,
+    location,
+    category,
+    groupSize,
+    cost,
+    isSaved,
+    isCompleted,
+  } = req.body;
   const owner = req.user._id;
 
-  Activity.create({ name, weather, imageUrl, owner })
+  Activity.create({
+    owner,
+    name,
+    description,
+    seasons,
+    location,
+    category,
+    groupSize,
+    cost,
+    isSaved,
+    isCompleted,
+  })
     .then((activity) => {
       res.status(CREATED).send({ data: activity });
     })
@@ -25,7 +47,9 @@ const createActivity = (req, res, next) => {
 
 const getActivities = (req, res, next) => {
   Activity.find({})
-    .then((activities) => res.send(activities))
+    .then((activities) => {
+      res.send(activities);
+    })
     .catch((err) => {
       console.error(err);
       return next(
@@ -64,47 +88,91 @@ const deleteActivityById = (req, res, next) => {
     });
 };
 
-const likeActivity = (req, res, next) => {
-  Activity.findByIdAndUpdate(
-    req.params.activityId,
-    { $addToSet: { likes: req.user._id } },
+const addSave = (req, res, next) => {
+  const { activityId } = req.params;
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { $addToSet: { savedActivities: activityId } },
     { new: true }
   )
     .orFail()
-    .then((activity) => res.send(activity))
+    .then((user) => res.send({ savedActivities: user.savedActivities }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "CastError") {
-        return next(new BadRequestError("the activity ID format isn't valid"));
-      }
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("Activity not found"));
       }
-      return next(
-        new InternalServerError("An error has occurred on the server.")
-      );
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid activity ID"));
+      }
+      return next(new InternalServerError("Server error"));
     });
 };
 
-const dislikeActivity = (req, res, next) => {
-  Activity.findByIdAndUpdate(
-    req.params.activityId,
-    { $pull: { likes: req.user._id } },
+const removeSave = (req, res, next) => {
+  const { activityId } = req.params;
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { $pull: { savedActivities: activityId } },
     { new: true }
   )
     .orFail()
-    .then((activity) => res.send(activity))
+    .then((user) => res.send({ savedActivities: user.savedActivities }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "CastError") {
-        return next(new BadRequestError("the activity ID format isn't valid"));
-      }
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("Activity not found"));
       }
-      return next(
-        new InternalServerError("An error has occurred on the server.")
-      );
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid activity ID"));
+      }
+      return next(new InternalServerError("Server error"));
+    });
+};
+
+const addComplete = (req, res, next) => {
+  const { activityId } = req.params;
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { $addToSet: { completedActivities: activityId } },
+    { new: true }
+  )
+    .orFail()
+    .then((user) => res.send({ completedActivities: user.completedActivities }))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "DocumentNotFoundError") {
+        return next(new NotFoundError("Activity not found"));
+      }
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid activity ID"));
+      }
+      return next(new InternalServerError("Server error"));
+    });
+};
+
+const removeComplete = (req, res, next) => {
+  const { activityId } = req.params;
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { $pull: { completedActivities: activityId } },
+    { new: true }
+  )
+    .orFail()
+    .then((user) => res.send({ completedActivities: user.completedActivities }))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "DocumentNotFoundError") {
+        return next(new NotFoundError("Activity not found"));
+      }
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid activity ID"));
+      }
+      return next(new InternalServerError("Server error"));
     });
 };
 
@@ -112,6 +180,8 @@ module.exports = {
   createActivity,
   getActivities,
   deleteActivityById,
-  likeActivity,
-  dislikeActivity,
+  addSave,
+  removeSave,
+  addComplete,
+  removeComplete,
 };

@@ -33,17 +33,9 @@ const getCurrentUser = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { email, password, name } = req.body;
 
-  bcrypt
-    .hash(password, 10)
-    .then((hash) =>
-      User.create({
-        name,
-        email,
-        password: hash,
-      })
-    )
+  User.create({ name, email, password })
     .then((user) => {
       res.status(CREATED).send(privateUserHelper(user));
     })
@@ -119,9 +111,44 @@ const patchCurrentUser = (req, res, next) => {
     });
 };
 
+const patchPassword = (req, res, next) => {
+  const { oldPassword, newPassword } = req.body;
+  const userId = req.user._id;
+
+  return User.findById(userId)
+    .select("+password")
+    .orFail()
+    .then((user) =>
+      bcrypt.compare(oldPassword, user.password).then((isMatch) => {
+        if (!isMatch) {
+          const err = new Error("Incorrect current password");
+          err.name = "BadRequestError";
+          throw err;
+        }
+        // assign new password **as plain text**, let pre-save hook hash it
+        user.password = newPassword;
+        return user.save();
+      })
+    )
+    .then(() =>
+      res.status(200).json({ message: "Password updated successfully" })
+    )
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError")
+        return next(new BadRequestError(Object.values(err.errors)[0].message));
+      if (err.name === "BadRequestError")
+        return next(new BadRequestError(err.message));
+      return next(
+        new InternalServerError("An error has occurred on the server.")
+      );
+    });
+};
+
 module.exports = {
   getCurrentUser,
   createUser,
   login,
   patchCurrentUser,
+  patchPassword,
 };

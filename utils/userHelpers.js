@@ -1,11 +1,11 @@
 const publicUserHelper = (user) => {
-  const { name, avatar, _id } = user;
-  return { name, avatar, _id };
+  const { name, _id } = user;
+  return { name, _id };
 };
 
 const privateUserHelper = (user) => {
-  const { name, avatar, email, _id } = user;
-  return { name, avatar, email, _id };
+  const { name, email, _id } = user;
+  return { name, email, _id };
 };
 
 module.exports = { publicUserHelper, privateUserHelper };
