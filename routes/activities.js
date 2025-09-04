@@ -20,7 +20,15 @@ router.get("/", getActivities);
 //private routes
 router.use(auth);
 
-router.post("/", validateCreateActivity, createActivity);
+router.post(
+  "/",
+  (req, res, next) => {
+    console.log("Incoming body for /activities:", req.body);
+    next();
+  },
+  validateCreateActivity,
+  createActivity
+);
 router.delete("/:activityId", validateActivityIDFormat, deleteActivityById);
 
 router.put("/:activityId/saved", validateActivityIDFormat, addSave);

@@ -7,6 +7,7 @@ const { ForbiddenError } = require("../utils/ForbiddenError");
 const { CREATED } = require("../utils/errors");
 
 const createActivity = (req, res, next) => {
+  console.log("Received activity in createActivity:", req.body);
   const {
     name,
     description,
@@ -18,10 +19,11 @@ const createActivity = (req, res, next) => {
     isSaved,
     isCompleted,
   } = req.body;
+
   const owner = req.user._id;
 
   Activity.create({
-    owner,
+    owner: req.user._id,
     name,
     description,
     seasons,
@@ -33,7 +35,7 @@ const createActivity = (req, res, next) => {
     isCompleted,
   })
     .then((activity) => {
-      res.status(CREATED).send({ data: activity });
+      res.status(CREATED).send(activity);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
