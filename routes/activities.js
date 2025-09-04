@@ -22,8 +22,10 @@ router.use(auth);
 
 router.post("/", validateCreateActivity, createActivity);
 router.delete("/:activityId", validateActivityIDFormat, deleteActivityById);
+
 router.put("/:activityId/saved", validateActivityIDFormat, addSave);
 router.delete("/:activityId/saved", validateActivityIDFormat, removeSave);
+
 router.put("/:activityId/completed", validateActivityIDFormat, addComplete);
 router.delete(
   "/:activityId/completed",

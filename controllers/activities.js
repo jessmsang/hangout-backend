@@ -96,6 +96,7 @@ const addSave = (req, res, next) => {
     { $addToSet: { savedActivities: activityId } },
     { new: true }
   )
+    .populate("savedActivities completedActivities")
     .orFail()
     .then((user) => res.send({ savedActivities: user.savedActivities }))
     .catch((err) => {
@@ -118,6 +119,7 @@ const removeSave = (req, res, next) => {
     { $pull: { savedActivities: activityId } },
     { new: true }
   )
+    .populate("savedActivities completedActivities")
     .orFail()
     .then((user) => res.send({ savedActivities: user.savedActivities }))
     .catch((err) => {
@@ -140,6 +142,7 @@ const addComplete = (req, res, next) => {
     { $addToSet: { completedActivities: activityId } },
     { new: true }
   )
+    .populate("savedActivities completedActivities")
     .orFail()
     .then((user) => res.send({ completedActivities: user.completedActivities }))
     .catch((err) => {
@@ -162,6 +165,7 @@ const removeComplete = (req, res, next) => {
     { $pull: { completedActivities: activityId } },
     { new: true }
   )
+    .populate("savedActivities completedActivities")
     .orFail()
     .then((user) => res.send({ completedActivities: user.completedActivities }))
     .catch((err) => {
