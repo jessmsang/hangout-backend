@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const Activity = require("../models/activity");
 const { BadRequestError } = require("../utils/BadRequestError");
 const { NotFoundError } = require("../utils/NotFoundError");
 const { InternalServerError } = require("../utils/InternalServerError");
@@ -12,14 +13,18 @@ const { privateUserHelper } = require("../utils/userHelpers");
 
 const getCurrentUser = (req, res, next) => {
   const { _id } = req.user;
+  console.log("Request received at /users/me");
+  console.log("REQ.USER:", req.user);
+
   User.findById(_id)
+    .populate("savedActivities")
+    .populate("completedActivities")
     .orFail()
     .then((user) => {
       res.send(privateUserHelper(user));
     })
     .catch((err) => {
-      console.error(err);
-
+      console.error("getCurrentUser error:", err);
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("User not found"));
       }

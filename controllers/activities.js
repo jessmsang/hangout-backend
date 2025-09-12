@@ -98,17 +98,13 @@ const addSave = (req, res, next) => {
     { $addToSet: { savedActivities: activityId } },
     { new: true }
   )
-    .populate("savedActivities completedActivities")
     .orFail()
-    .then((user) => res.send({ savedActivities: user.savedActivities }))
+    .then((user) => {
+      if (!user) throw new Error("User not found");
+      res.send({ savedActivities: user.savedActivities });
+    })
     .catch((err) => {
-      console.error(err);
-      if (err.name === "DocumentNotFoundError") {
-        return next(new NotFoundError("Activity not found"));
-      }
-      if (err.name === "CastError") {
-        return next(new BadRequestError("Invalid activity ID"));
-      }
+      console.error("addSave error:", err);
       return next(new InternalServerError("Server error"));
     });
 };
@@ -121,7 +117,6 @@ const removeSave = (req, res, next) => {
     { $pull: { savedActivities: activityId } },
     { new: true }
   )
-    .populate("savedActivities completedActivities")
     .orFail()
     .then((user) => res.send({ savedActivities: user.savedActivities }))
     .catch((err) => {
@@ -144,7 +139,6 @@ const addComplete = (req, res, next) => {
     { $addToSet: { completedActivities: activityId } },
     { new: true }
   )
-    .populate("savedActivities completedActivities")
     .orFail()
     .then((user) => res.send({ completedActivities: user.completedActivities }))
     .catch((err) => {
@@ -167,7 +161,6 @@ const removeComplete = (req, res, next) => {
     { $pull: { completedActivities: activityId } },
     { new: true }
   )
-    .populate("savedActivities completedActivities")
     .orFail()
     .then((user) => res.send({ completedActivities: user.completedActivities }))
     .catch((err) => {

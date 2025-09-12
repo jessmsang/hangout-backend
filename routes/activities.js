@@ -23,7 +23,6 @@ router.use(auth);
 router.post(
   "/",
   (req, res, next) => {
-    console.log("Incoming body for /activities:", req.body);
     next();
   },
   validateCreateActivity,

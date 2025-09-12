@@ -4,8 +4,15 @@ const publicUserHelper = (user) => {
 };
 
 const privateUserHelper = (user) => {
-  const { name, email, _id } = user;
-  return { name, email, _id };
+  const { name, email, _id, savedActivities, completedActivities } = user;
+
+  return {
+    name,
+    email,
+    _id,
+    savedActivities: savedActivities || [],
+    completedActivities: completedActivities || [],
+  };
 };
 
 module.exports = { publicUserHelper, privateUserHelper };
