@@ -7,7 +7,6 @@ const { ForbiddenError } = require("../utils/ForbiddenError");
 const { CREATED } = require("../utils/errors");
 
 const createActivity = (req, res, next) => {
-  console.log("Received activity in createActivity:", req.body);
   const {
     name,
     description,

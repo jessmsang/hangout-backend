@@ -13,8 +13,6 @@ const { privateUserHelper } = require("../utils/userHelpers");
 
 const getCurrentUser = (req, res, next) => {
   const { _id } = req.user;
-  console.log("Request received at /users/me");
-  console.log("REQ.USER:", req.user);
 
   User.findById(_id)
     .populate("savedActivities")
@@ -24,7 +22,6 @@ const getCurrentUser = (req, res, next) => {
       res.send(privateUserHelper(user));
     })
     .catch((err) => {
-      console.error("getCurrentUser error:", err);
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("User not found"));
       }
@@ -42,7 +39,14 @@ const createUser = (req, res, next) => {
 
   User.create({ name, email, password })
     .then((user) => {
-      res.status(CREATED).send(privateUserHelper(user));
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      res.status(CREATED).send({
+        token,
+        ...privateUserHelper(user),
+      });
     })
     .catch((err) => {
       console.error(err);
