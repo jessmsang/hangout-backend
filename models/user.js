@@ -35,12 +35,23 @@ const userSchema = new mongoose.Schema(
           return /^(?=.*[A-Z])(?=.*[!@#$%^&*_+\-=?]).{8,50}$/.test(value);
         },
         message:
-          "Password must be 8–50 characters, include at least one uppercase letter and one special character.",
+          "Password must be 8-50 characters, include at least one uppercase letter and one special character.",
       },
     },
+
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+
+    resetPasswordExpires: {
+      type: Date,
+    },
+
     savedActivities: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Activity" },
     ],
+
     completedActivities: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Activity" },
     ],
